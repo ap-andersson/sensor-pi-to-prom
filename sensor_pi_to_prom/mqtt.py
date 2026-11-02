@@ -29,14 +29,15 @@ CPU_TEMPERATURE = "cpu_temperature_celsius"
 
 # measurement key -> Home Assistant entity settings
 _HA_ENTITIES = {
-    TEMPERATURE: {"name": "Temperature", "device_class": "temperature", "unit": "°C"},
-    HUMIDITY: {"name": "Humidity", "device_class": "humidity", "unit": "%"},
+    TEMPERATURE: {"name": "Temperature", "device_class": "temperature", "unit": "°C", "precision": 1},
+    HUMIDITY: {"name": "Humidity", "device_class": "humidity", "unit": "%", "precision": 1},
     # Published in Pa like the Prometheus metric, shown in hPa in Home Assistant.
-    PRESSURE: {"name": "Pressure", "device_class": "pressure", "unit": "hPa", "scale": 0.01},
+    PRESSURE: {"name": "Pressure", "device_class": "pressure", "unit": "hPa", "scale": 0.01, "precision": 1},
     CPU_TEMPERATURE: {
         "name": "CPU temperature",
         "device_class": "temperature",
         "unit": "°C",
+        "precision": 1,
         "entity_category": "diagnostic",
     },
 }
@@ -163,6 +164,7 @@ class MqttPublisher:
                 "device_class": entity["device_class"],
                 "unit_of_measurement": entity["unit"],
                 "state_class": "measurement",
+                "suggested_display_precision": entity["precision"],
                 "availability_topic": self.availability_topic,
                 # Go "unavailable" if readings stop (sensor failing) while the
                 # service itself is still connected.
