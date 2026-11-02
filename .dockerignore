@@ -1,0 +1,5 @@
+*
+!requirements.txt
+!sensor_pi_to_prom/
+**/__pycache__
+**/*.pyc

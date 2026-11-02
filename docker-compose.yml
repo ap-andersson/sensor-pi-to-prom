@@ -1,0 +1,29 @@
+# Per-host settings go in a .env file next to this file, e.g.
+#
+#   SENSOR=bme280
+#   SENSOR_DEVICE=/dev/i2c-1      # /dev/gpiochip0 for dht22
+#   GPIO_PIN=4                    # dht22 only
+#
+# See .env.example for everything that can be set.
+
+services:
+  sensor-pi-to-prom:
+    image: ${IMAGE:-ghcr.io/ap-andersson/sensor-pi-to-prom:latest}
+    container_name: sensor-pi-to-prom
+    restart: unless-stopped
+    init: true
+    ports:
+      - ${METRICS_PORT:-8000}:${METRICS_PORT:-8000}
+    # Only the one device node the sensor needs, instead of privileged: true.
+    devices:
+      - ${SENSOR_DEVICE:?set SENSOR_DEVICE in .env, e.g. /dev/i2c-1 or /dev/gpiochip0}
+    environment:
+      SENSOR: ${SENSOR:?set SENSOR in .env (bme280, htu21 or dht22)}
+      RUN_INTERVAL_SECONDS: ${RUN_INTERVAL_SECONDS:-60}
+      METRICS_PORT: ${METRICS_PORT:-8000}
+      EXPORT_CPU_TEMPERATURE: ${EXPORT_CPU_TEMPERATURE:-true}
+      I2C_BUS: ${I2C_BUS:-}
+      I2C_ADDRESS: ${I2C_ADDRESS:-}
+      GPIO_CHIP: ${GPIO_CHIP:-}
+      GPIO_PIN: ${GPIO_PIN:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}

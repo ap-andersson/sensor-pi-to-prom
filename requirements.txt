@@ -1,0 +1,6 @@
+prometheus_client==0.26.0
+smbus2==0.6.1
+RPi.bme280==0.2.4
+# Prebuilt aarch64 wheels exist up to CPython 3.12; keep the base image on 3.12
+# so no compiler is needed in the image.
+lgpio==0.2.2.0
