@@ -10,12 +10,20 @@ Replaces `rpi-bme280-to-prom`, `rpi-htu21-to-prom` and `rpi-dht22-to-prom`.
 |---|---|---|---|
 | `bme280` | I2C, default address `0x76` | temperature, humidity, pressure | Pi 5 |
 | `htu21`  | I2C, default address `0x40` | temperature, humidity | Pi 5 |
-| `dht22`  | one GPIO (`GPIO_PIN`, BCM number) | temperature, humidity | not yet |
+| `dht22`  | one GPIO (`GPIO_PIN`, BCM number) | temperature, humidity | **untested** |
 
 All hardware access goes through the kernel character devices (`/dev/i2c-N`,
-`/dev/gpiochipN`) via `smbus2` and `lgpio`, so the same code works on the Pi 5
-and older models. The container gets only that one device node, not
+`/dev/gpiochipN`) via `smbus2` and `lgpio`, which should work on older Pi
+models as well as the Pi 5. The container gets only that one device node, not
 `privileged: true`.
+
+> **Testing status:** only the BME280 and HTU21 have been tested, and only on a
+> Raspberry Pi 5 (64-bit Raspberry Pi OS, kernel 6.18). The DHT22 driver and
+> other Pi models (Pi 4 and older) have not been tested at all yet.
+
+> **AI assistance:** parts of this project (code, scripts and documentation)
+> were created with the help of Claude (Anthropic's AI assistant). Commits
+> with AI involvement carry a `Co-Authored-By: Claude` trailer.
 
 ## Run
 
