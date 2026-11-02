@@ -44,30 +44,10 @@ curl -s localhost:8000/metrics
 | `sensor_pressure_pascals{sensor}` | bme280 only |
 | `sensor_read_errors_total{sensor}` | failed reads (DHT22 counts a read as failed after 3 attempts) |
 | `sensor_last_success_timestamp_seconds{sensor}` | alert on `time() - this > 300` to catch a dead sensor |
-| `rpi_cpu_temperature_celsius` | disable with `EXPORT_CPU_TEMPERATURE=false` (node-exporter already has `node_thermal_zone_temp`) |
+| `rpi_cpu_temperature_celsius` | disable with `EXPORT_CPU_TEMPERATURE=false` |
 
 If a read fails, the measurement series are removed until the next good read,
 so graphs show a gap instead of a stale value.
-
-Old to new names: `temperature` → `sensor_temperature_celsius`, `humidity` →
-`sensor_relative_humidity_percent`, `pressure` (hPa) → `sensor_pressure_pascals`
-(Pa, ×100), `cpu_temp` → `rpi_cpu_temperature_celsius`.
-
-### Migrating history from the old exporters
-
-`scripts/migrate-old-metrics.py` copies the old series in VictoriaMetrics into
-the new names (adds the `sensor` label, converts hPa to Pa, only copies samples
-older than the new series' first sample, leaves the old series alone). Dry run
-by default:
-
-```sh
-scripts/migrate-old-metrics.py --vm http://<victoriametrics>:8428 \
-    --target <scrape-job>=bme280 --target <other-job>=htu21 [--apply]
-```
-
-Note that the old exporters rounded values (humidity to whole percent,
-temperature to 0.1 °C, pressure to whole hPa), so migrated history is coarser
-than new data.
 
 ## Configuration
 
