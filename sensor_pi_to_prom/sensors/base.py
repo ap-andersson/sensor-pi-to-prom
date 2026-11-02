@@ -48,3 +48,16 @@ def env_int(name: str, default: int | None = None) -> int:
         return int(raw.strip(), 0)
     except ValueError:
         raise ValueError(f"environment variable {name} must be an integer, got {raw!r}") from None
+
+
+def env_bool(name: str, default: bool) -> bool:
+    """Read a boolean env var; unset or empty means the default."""
+    raw = os.getenv(name)
+    if raw is None or raw.strip() == "":
+        return default
+    value = raw.strip().lower()
+    if value in ("1", "true", "yes", "on"):
+        return True
+    if value in ("0", "false", "no", "off"):
+        return False
+    raise ValueError(f"environment variable {name} must be true or false, got {raw!r}")

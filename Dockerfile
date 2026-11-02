@@ -16,6 +16,9 @@ RUN pip install --only-binary=:all: -r requirements.txt
 
 COPY sensor_pi_to_prom ./sensor_pi_to_prom
 
+ARG APP_VERSION=dev
+ENV APP_VERSION=${APP_VERSION}
+
 EXPOSE 8000
 
 CMD ["python3", "-m", "sensor_pi_to_prom"]

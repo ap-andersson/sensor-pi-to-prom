@@ -11,16 +11,24 @@ permissions:
   contents: read
   packages: write
 
+# Tags:
+#   pull request                    -> pr-<number> (moves to the newest build of the PR)
+#   push/merge to main, manual run  -> latest + sha-<commit>
+#   git tag vX.Y.Z                  -> X.Y.Z, X.Y + sha-<commit>
+
 jobs:
   build:
     runs-on: ubuntu-24.04-arm  # native arm64 runner, no QEMU emulation needed
+    env:
+      # Fork PRs get a read-only token, so build them without pushing.
+      PUSH: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     steps:
       - uses: actions/checkout@v4
 
       - uses: docker/setup-buildx-action@v3
 
       - uses: docker/login-action@v3
-        if: github.event_name != 'pull_request'
+        if: env.PUSH == 'true'
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -31,17 +39,20 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository_owner }}/sensor-pi-to-prom
           tags: |
+            type=ref,event=pr
             type=raw,value=latest,enable={{is_default_branch}}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha
+            type=sha,enable=${{ github.event_name != 'pull_request' }}
 
       - uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ env.PUSH == 'true' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APP_VERSION=${{ steps.meta.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
